@@ -22,6 +22,10 @@ export class AppSandbox {
     return this.gitService.status(pathToRepository);
   }
 
+  stageAll(pathToRepository: string): Observable<boolean> {
+    return this.gitService.stageAll(pathToRepository);
+  }
+
   commit(pathToRepository: string, message: string, hooks: boolean = true): Observable<boolean> {
     return this.gitService.commit(pathToRepository, message, hooks);
   }

@@ -21,6 +21,7 @@ import {
 } from 'rxjs/operators';
 import { Destroy } from 'ngx-reactivetoolkit';
 import { timer } from 'rxjs/observable/timer';
+import { Subject } from 'rxjs/Subject';
 
 @Component({
   selector: 'app-ctn-home',
@@ -65,7 +66,7 @@ import { timer } from 'rxjs/observable/timer';
             </div>
             <br>
             <h4>Commit</h4>
-            <form [formGroup]="form" (submit)="onSubmit()">
+            <form [formGroup]="form">
               <div class="form-group">
                 <label for="type">Type</label>
                 <select id="type" class="form-control" formControlName="type">
@@ -97,7 +98,24 @@ import { timer } from 'rxjs/observable/timer';
                 <input type="text" id="type" class="form-control" formControlName="issuesClosed">
               </div>
               <div class="form-group">
-                <button type="submit" class="btn btn-primary" [disabled]="!form.valid">Commit</button>
+                <div class="row">
+                  <div class="col">
+                    <span *ngIf="success$ | async as success" class="text-success">{{success}}</span>
+                    <span *ngIf="error$ | async" class="text-danger">It was not possible to commit any file. Please make sure a file is staged.</span>
+                  </div>
+                  <div class="col text-right">
+                    <button type="button"
+                            class="btn btn-primary"
+                            [disabled]="!form.valid"
+                            (click)="onSubmitStageAllAndCommit()">Stage all & commit
+                    </button>
+                    <button type="button"
+                            class="btn btn-primary"
+                            [disabled]="!form.valid"
+                            (click)="onSubmitCommit()">Commit
+                    </button>
+                  </div>
+                </div>
               </div>
             </form>
           </div>
@@ -166,6 +184,8 @@ export class RepositoryDetailContainer implements OnInit, OnDestroy {
   localRepository$: Observable<LocalRepository>;
   numberOfCommits$: Observable<number>;
   currentBranch$: Observable<string>;
+  success$ = new Subject<string>();
+  error$ = new Subject<boolean>();
 
   constructor(private sb: AppSandbox,
               private fb: FormBuilder,
@@ -183,10 +203,35 @@ export class RepositoryDetailContainer implements OnInit, OnDestroy {
   ngOnDestroy(): void {
   }
 
-  onSubmit(): void {
+  onSubmitCommit(): void {
+    this.error$.next(false);
     this.localRepository$.pipe(
-      mergeMap(repo => this.sb.commit(repo.path, this.buildCommitMessage()))
-    ).subscribe();
+      mergeMap(repo => this.sb.commit(repo.path, this.buildCommitMessage(), false))
+    ).subscribe(
+      () => {
+        this.success$.next('You\'re staged files are commited.');
+        this.form.reset();
+        setTimeout(() => this.success$.next(null), 5000);
+      },
+      (err) => {
+        this.error$.next(true);
+      }
+    );
+  }
+
+  onSubmitStageAllAndCommit(): void {
+    this.error$.next(false);
+    this.localRepository$.pipe(
+      mergeMap(repo => this.sb.stageAll(repo.path).pipe(
+        mergeMap(() => this.sb.commit(repo.path, this.buildCommitMessage(), false))
+      ))
+    ).subscribe(
+      () => {
+        this.success$.next('You\'re files are staged and commited.');
+        this.form.reset();
+        setTimeout(() => this.success$.next(null), 5000);
+      }
+    );
   }
 
   buildCommitMessage(): string {
