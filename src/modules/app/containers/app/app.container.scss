@@ -1,0 +1,17 @@
+:host {
+  display: flex;
+  height: 100%;
+
+  .repos {
+    flex-shrink: 0;
+    overflow: hidden;
+    z-index: 2;
+    width: 375px;
+    background-color: #008779;
+  }
+
+  .repo-details {
+    z-index: 1;
+    width: 100%;
+  }
+}

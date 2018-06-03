@@ -1,0 +1,43 @@
+:host {
+  display: flex;
+  height: 100%;
+
+  > div {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+
+    .header {
+      display: flex;
+      flex-shrink: 0;
+      justify-content: space-between;
+      align-items: center;
+      height: 65px;
+      padding: 0 1.25rem;
+      background-color: #fafafa;
+      box-shadow: 0 2px 5px -2px rgba(0,0,0,0.35);
+
+      .title {
+        font-size: 1.375rem;
+      }
+
+      .actions {
+        i {
+          display: inline-block;
+          margin-left: .75rem;
+
+          &:first-child {
+            margin-left: 0;
+          }
+        }
+      }
+    }
+
+    .main {
+      overflow-x: hidden;
+      height: 100%;
+      padding: 1rem 1.25rem;
+    }
+  }
+}
