@@ -21,4 +21,12 @@ export class AppSandbox {
   commit(pathToRepository: string, message: string, hooks: boolean = true): Observable<boolean> {
     return this.gitService.commit(pathToRepository, message, hooks);
   }
+
+  numberOfCommits(pathToRepository: string): Observable<number> {
+    return this.gitService.numberOfCommits(pathToRepository);
+  }
+
+  currentBranch(pathToRepository: string): Observable<string> {
+    return this.gitService.currentBranch(pathToRepository);
+  }
 }

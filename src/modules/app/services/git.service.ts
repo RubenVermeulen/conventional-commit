@@ -6,7 +6,10 @@ import {
   IGitExecutionOptions,
   IGitResult
 } from 'dugite';
-import { map } from 'rxjs/operators';
+import {
+  map,
+  mapTo
+} from 'rxjs/operators';
 
 
 @Injectable()
@@ -17,9 +20,7 @@ export class GitService {
   stageAll(pathToRepository: string): Observable<boolean> {
     const command = ['add', '.'];
 
-    return this.execute(pathToRepository, command).pipe(
-      map(res => res.exitCode === 0)
-    );
+    return this.execute(pathToRepository, command).pipe(mapTo(true));
   }
 
   commit(pathToRepository: string, message: string, hooks: boolean = true): Observable<boolean> {
@@ -30,12 +31,34 @@ export class GitService {
       command.push('--no-verify');
     }
 
-    return this.execute(pathToRepository, command, options).pipe(
-      map(res => res.exitCode === 0)
+    return this.execute(pathToRepository, command, options).pipe(mapTo(true));
+  }
+
+  numberOfCommits(pathToRepository: string): Observable<number> {
+    const command = ['rev-list', '--all', '--count'];
+
+    return this.execute(pathToRepository, command).pipe(
+      map(res => res.stdout)
+    );
+  }
+
+  currentBranch(pathToRepository: string): Observable<string> {
+    const command = ['rev-parse', '--abbrev-ref', 'HEAD'];
+
+    return this.execute(pathToRepository, command).pipe(
+      map(res => res.stdout)
     );
   }
 
   private execute(pathToRepository: string, command: string[], options?: IGitExecutionOptions): Observable<IGitResult> {
-    return fromPromise(GitProcess.exec(command, pathToRepository, options));
+    return fromPromise(GitProcess.exec(command, pathToRepository, options)).pipe(
+      map(res => {
+        if (res.exitCode === 0) {
+          return res;
+        }
+
+        throw new Error(res.stderr);
+      })
+    );
   }
 }

@@ -1,5 +1,6 @@
 import {
   Component,
+  OnDestroy,
   OnInit
 } from '@angular/core';
 import {
@@ -14,15 +15,18 @@ import { ActivatedRoute } from '@angular/router';
 import {
   filter,
   map,
-  mergeMap
+  mergeMap,
+  switchMap,
+  takeUntil
 } from 'rxjs/operators';
 import { NodeGitService } from '../../services/node-git.service';
+import { Destroy } from 'ngx-reactivetoolkit';
+import { timer } from 'rxjs/observable/timer';
 
 @Component({
   selector: 'app-ctn-home',
   styleUrls: ['./repository-detail.container.scss'],
   template: `
-
     <div *ngIf="localRepository$ | async as localRepository">
       <div class="header">
         <div class="title">{{localRepository.name}}</div>
@@ -34,6 +38,34 @@ import { NodeGitService } from '../../services/node-git.service';
       <div class="main">
         <perfect-scrollbar>
           <div class="padding">
+            <h4>Details</h4>
+            <div class="row">
+              <div class="col">
+                <div class="key">Git hooks</div>
+                <div class="value">{{localRepository.hooks ? 'Yes' : 'No'}}</div>
+              </div>
+              <div class="col">
+                <div class="key">Monorepo project</div>
+                <div class="value">{{localRepository.monorepo ? 'Yes' : 'No'}}</div>
+              </div>
+              <div class="col">
+                <div class="key">Commits</div>
+                <div class="value">{{numberOfCommits$ | async}}</div>
+              </div>
+              <div class="col">
+                <div class="key">Current brach</div>
+                <div class="value">{{currentBranch$ | async}}</div>
+              </div>
+            </div>
+            <br>
+            <div class="row">
+              <div class="col">
+                <div class="key">Path</div>
+                <div class="value">{{localRepository.path}}</div>
+              </div>
+            </div>
+            <br>
+            <h4>Commit</h4>
             <form [formGroup]="form" (submit)="onSubmit()">
               <div class="form-group">
                 <label for="type">Type</label>
@@ -75,7 +107,9 @@ import { NodeGitService } from '../../services/node-git.service';
     </div>
   `
 })
-export class RepositoryDetailContainer implements OnInit {
+export class RepositoryDetailContainer implements OnInit, OnDestroy {
+  @Destroy() destroy$;
+
   form = this.fb.group({
     type: [null, Validators.required],
     scope: ['', Validators.required],
@@ -131,6 +165,8 @@ export class RepositoryDetailContainer implements OnInit {
 
   repositoryId$: Observable<string>;
   localRepository$: Observable<LocalRepository>;
+  numberOfCommits$: Observable<number>;
+  currentBranch$: Observable<string>;
 
   constructor(private sb: AppSandbox,
               private fb: FormBuilder,
@@ -142,6 +178,11 @@ export class RepositoryDetailContainer implements OnInit {
   ngOnInit() {
     this.repositoryId$ = this.calculateRepositoryId$();
     this.localRepository$ = this.calculateLocalRepository$();
+    this.numberOfCommits$ = this.calculateNumberOfCommits$();
+    this.currentBranch$ = this.calculateCurrentBranch$();
+  }
+
+  ngOnDestroy(): void {
   }
 
   onSubmit(): void {
@@ -176,11 +217,29 @@ export class RepositoryDetailContainer implements OnInit {
 
   private calculateLocalRepository$(): Observable<LocalRepository> {
     return this.repositoryId$.pipe(
-      mergeMap(repositoryId =>
+      switchMap(repositoryId =>
         this.sb.repositories$.pipe(
           map(repositories => repositories.find(repo => repo.repositoryId === repositoryId))
         )
       )
+    );
+  }
+
+  private calculateNumberOfCommits$(): Observable<number> {
+    return this.localRepository$.pipe(
+      switchMap(repo => timer(0, 10000).pipe(
+        switchMap(() => this.sb.numberOfCommits(repo.path)),
+        takeUntil(this.destroy$)
+      ))
+    );
+  }
+
+  private calculateCurrentBranch$(): Observable<string> {
+    return this.localRepository$.pipe(
+      switchMap(repo => timer(0, 3500).pipe(
+        switchMap(() => this.sb.currentBranch(repo.path)),
+        takeUntil(this.destroy$)
+      ))
     );
   }
 }

@@ -38,6 +38,7 @@
     "font-awesome": "^4.7.0",
     "jquery": "^3.3.1",
     "ngx-perfect-scrollbar": "^5.3.5",
+    "ngx-reactivetoolkit": "^4.0.1",
     "nodegit": "^0.22.1",
     "popper.js": "^1.14.3",
     "ruve-ngrx-store-localstorage": "^5.0.1"

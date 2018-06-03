@@ -34,6 +34,18 @@ const {dialog} = window.require('electron').remote;
           <label for="name">Name</label>
           <input type="text" id="name" class="form-control" formControlName="name">
         </div>
+        <div class="form-group">
+          <div class="row">
+            <div class="col">
+              <input type="checkbox" id="hooks" formControlName="hooks">
+              <label for="hooks">Enable hooks</label>
+            </div>
+            <div class="col">
+              <input type="checkbox" id="monorepo" formControlName="monorepo">
+              <label for="monorepo">Monorepo project</label>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-outline-dark" (click)="ngbActiveModal.close()">Close</button>
@@ -45,7 +57,9 @@ const {dialog} = window.require('electron').remote;
 export class RepositoryAddContainer implements OnInit {
   form = this.fb.group({
     name: ['', Validators.required],
-    path: ['', Validators.required]
+    path: ['', Validators.required],
+    hooks: [true, Validators.required],
+    monorepo: [false, Validators.required]
   });
 
   error$ = new Subject();
@@ -98,7 +112,9 @@ export class RepositoryAddContainer implements OnInit {
           this.sb.addRepository({
             repositoryId: new Date().getMilliseconds().toString(),
             name: this.form.value.name,
-            path: this.form.value.path
+            path: this.form.value.path,
+            hooks: true,
+            monorepo: false
           });
           this.ngbActiveModal.close();
         });
