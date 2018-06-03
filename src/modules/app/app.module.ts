@@ -28,6 +28,7 @@ import { RepositoriesListItemComponent } from './components/repositories-list/re
 import { RepositoryNotSelectedContainer } from './containers/repository-not-selected/repository-not-selected.container';
 import { NodeGitService } from './services/node-git.service';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
+import { GitService } from './services/git.service';
 
 
 @NgModule({
@@ -52,7 +53,7 @@ import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
     StoreDevtoolsModule.instrument(),
     PerfectScrollbarModule
   ],
-  providers: [ElectronService, CzLernaChangelogService, AppSandbox, NodeGitService],
+  providers: [ElectronService, CzLernaChangelogService, AppSandbox, NodeGitService, GitService],
   entryComponents: [RepositoryAddContainer],
   bootstrap: [AppContainer]
 })

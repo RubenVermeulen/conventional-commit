@@ -538,6 +538,7 @@ module.exports = {
   },
   externals: {
     nodegit: 'commonjs nodegit',
-    child_process: 'commonjs child_process'
+    child_process: 'commonjs child_process',
+    dugite: 'commonjs dugite',
   }
 };

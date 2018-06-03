@@ -7,7 +7,6 @@ import {
   Validators
 } from '@angular/forms';
 import { CzLernaChangelogService } from '../../services/cz-lerna-changelog.service';
-import { commit } from '../../operations/commit.operation';
 import { Observable } from 'rxjs/Observable';
 import { LocalRepository } from '../../types/local-repository.type';
 import { AppSandbox } from '../../app.sandbox';
@@ -15,10 +14,8 @@ import { ActivatedRoute } from '@angular/router';
 import {
   filter,
   map,
-  mergeMap,
-  take
+  mergeMap
 } from 'rxjs/operators';
-import { Repository } from 'nodegit';
 import { NodeGitService } from '../../services/node-git.service';
 
 @Component({
@@ -35,45 +32,45 @@ import { NodeGitService } from '../../services/node-git.service';
         </div>
       </div>
       <div class="main">
-          <perfect-scrollbar>
-            <div class="padding">
-              <form [formGroup]="form" (submit)="onSubmit()">
-                <div class="form-group">
-                  <label for="type">Type</label>
-                  <select id="type" class="form-control" formControlName="type">
-                    <option [ngValue]="null">--- Select your type ---</option>
-                    <option *ngFor="let type of types" [ngValue]="type.value"><strong>{{type.name}}</strong></option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label for="scope">Scope</label>
-                  <input type="text" id="scope" class="form-control" formControlName="scope">
-                </div>
-                <div class="form-group">
-                  <label for="subject">Subject</label>
-                  <input type="text" id="subject" class="form-control" formControlName="subject">
-                  <small class="form-text text-muted">Your commit message</small>
-                </div>
-                <div class="form-group">
-                  <label for="body">Body</label>
-                  <textarea id="body" class="form-control" formControlName="body"></textarea>
-                  <small class="form-text text-muted">All new lines will be removed.</small>
-                </div>
-                <div class="form-group">
-                  <label for="breakingChanges">Breaking changes</label>
-                  <textarea id="breakingChanges" class="form-control" formControlName="breakingChanges"></textarea>
-                  <small class="form-text text-muted">All new lines will be removed.</small>
-                </div>
-                <div class="form-group">
-                  <label for="issuesClosed">Issues closed</label>
-                  <input type="text" id="type" class="form-control" formControlName="issuesClosed">
-                </div>
-                <div class="form-group">
-                  <button type="submit" class="btn btn-primary" [disabled]="!form.valid">Commit</button>
-                </div>
-              </form>
-            </div>
-          </perfect-scrollbar>
+        <perfect-scrollbar>
+          <div class="padding">
+            <form [formGroup]="form" (submit)="onSubmit()">
+              <div class="form-group">
+                <label for="type">Type</label>
+                <select id="type" class="form-control" formControlName="type">
+                  <option [ngValue]="null">--- Select your type ---</option>
+                  <option *ngFor="let type of types" [ngValue]="type.value"><strong>{{type.name}}</strong></option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="scope">Scope</label>
+                <input type="text" id="scope" class="form-control" formControlName="scope">
+              </div>
+              <div class="form-group">
+                <label for="subject">Subject</label>
+                <input type="text" id="subject" class="form-control" formControlName="subject">
+                <small class="form-text text-muted">Your commit message</small>
+              </div>
+              <div class="form-group">
+                <label for="body">Body</label>
+                <textarea id="body" class="form-control" formControlName="body"></textarea>
+                <small class="form-text text-muted">All new lines will be removed.</small>
+              </div>
+              <div class="form-group">
+                <label for="breakingChanges">Breaking changes</label>
+                <textarea id="breakingChanges" class="form-control" formControlName="breakingChanges"></textarea>
+                <small class="form-text text-muted">All new lines will be removed.</small>
+              </div>
+              <div class="form-group">
+                <label for="issuesClosed">Issues closed</label>
+                <input type="text" id="type" class="form-control" formControlName="issuesClosed">
+              </div>
+              <div class="form-group">
+                <button type="submit" class="btn btn-primary" [disabled]="!form.valid">Commit</button>
+              </div>
+            </form>
+          </div>
+        </perfect-scrollbar>
       </div>
     </div>
   `
@@ -134,7 +131,6 @@ export class RepositoryDetailContainer implements OnInit {
 
   repositoryId$: Observable<string>;
   localRepository$: Observable<LocalRepository>;
-  repository$: Observable<Repository>;
 
   constructor(private sb: AppSandbox,
               private fb: FormBuilder,
@@ -146,13 +142,11 @@ export class RepositoryDetailContainer implements OnInit {
   ngOnInit() {
     this.repositoryId$ = this.calculateRepositoryId$();
     this.localRepository$ = this.calculateLocalRepository$();
-    this.repository$ = this.calculateRepository$();
   }
 
   onSubmit(): void {
-    this.repository$.pipe(
-      mergeMap(repo => commit(repo, this.buildCommitMessage())),
-      take(1)
+    this.localRepository$.pipe(
+      mergeMap(repo => this.sb.commit(repo.path, this.buildCommitMessage()))
     ).subscribe();
   }
 
@@ -187,12 +181,6 @@ export class RepositoryDetailContainer implements OnInit {
           map(repositories => repositories.find(repo => repo.repositoryId === repositoryId))
         )
       )
-    );
-  }
-
-  private calculateRepository$(): Observable<Repository> {
-    return this.localRepository$.pipe(
-      mergeMap(repo => this.nodeGitService.openRepository(repo.path))
     );
   }
 }
