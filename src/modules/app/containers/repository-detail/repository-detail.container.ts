@@ -11,7 +11,10 @@ import { CzLernaChangelogService } from '../../services/cz-lerna-changelog.servi
 import { Observable } from 'rxjs/Observable';
 import { LocalRepository } from '../../types/local-repository.type';
 import { AppSandbox } from '../../app.sandbox';
-import { ActivatedRoute } from '@angular/router';
+import {
+  ActivatedRoute,
+  Router
+} from '@angular/router';
 import {
   filter,
   map,
@@ -31,8 +34,8 @@ import { Subject } from 'rxjs/Subject';
       <div class="header">
         <div class="title">{{localRepository.name}}</div>
         <div class="actions">
-          <i class="fa fa-wd fa-pencil"></i>
-          <i class="fa fa-wd fa-trash-o"></i>
+          <button class="btn btn-outline-danger"
+                  (click)="onRemove(localRepository.repositoryId)"><i class="fa fa-wd fa-trash-o"></i></button>
         </div>
       </div>
       <div class="main">
@@ -190,6 +193,7 @@ export class RepositoryDetailContainer implements OnInit, OnDestroy {
   constructor(private sb: AppSandbox,
               private fb: FormBuilder,
               private czLernaChangelogService: CzLernaChangelogService,
+              private router: Router,
               private activatedRoute: ActivatedRoute) {
   }
 
@@ -234,7 +238,12 @@ export class RepositoryDetailContainer implements OnInit, OnDestroy {
     );
   }
 
-  buildCommitMessage(): string {
+  onRemove(repositoryId): void {
+    this.sb.removeRepository(repositoryId);
+    this.router.navigate(['/']);
+  }
+
+  private buildCommitMessage(): string {
     return this.form.valid
       ? this.czLernaChangelogService.build(
         this.form.value.type,

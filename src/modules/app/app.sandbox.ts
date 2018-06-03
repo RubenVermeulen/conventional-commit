@@ -2,7 +2,10 @@ import { Injectable } from '@angular/core';
 import { ApplicationState } from '../statemanagement/application.state';
 import { Store } from '@ngrx/store';
 import { LocalRepository } from './types/local-repository.type';
-import { RepositoriesAddAction } from '../statemanagement/actions/repositories.actions';
+import {
+  RepositoriesAddAction,
+  RepositoriesRemoveAction
+} from '../statemanagement/actions/repositories.actions';
 import { Observable } from 'rxjs/Observable';
 import { GitService } from './services/git.service';
 
@@ -16,6 +19,10 @@ export class AppSandbox {
 
   addRepository(repository: LocalRepository): void {
     this.store.dispatch(new RepositoriesAddAction(repository));
+  }
+
+  removeRepository(repositoryId: string): void {
+    this.store.dispatch(new RepositoriesRemoveAction(repositoryId));
   }
 
   status(pathToRepository: string): Observable<boolean> {
