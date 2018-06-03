@@ -161,7 +161,7 @@ export class RepositoryDetailContainer implements OnInit {
       ? this.czLernaChangelogService.build(
         this.form.value.type,
         this.form.value.scope,
-        this.form.value.subject,
+        this.form.value.subject.toLowerCase(),
         this.handleTextareaValue(this.form.value.body),
         this.handleTextareaValue(this.form.value.breakingChanges),
         this.form.value.issuesClosed

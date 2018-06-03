@@ -9,12 +9,12 @@ export class CzLernaChangelogService {
     body?: string,
     breakingChanges?: string,
     issuesClosed?: string): string {
-    return `${type}(${scope}): ${subject}${this.buildBody(body)}${this.buildBreakingChanges(breakingChanges)}${this.buildIssuesClosed(issuesClosed)}`;
+    return `${type}(${scope}): ${subject.toLowerCase()}${this.buildBody(body)}${this.buildBreakingChanges(breakingChanges)}${this.buildIssuesClosed(issuesClosed)}`;
   }
 
   private buildBody(body?: string) {
     return body
-      ? `\n\n${body.toLowerCase()}`
+      ? `\n\n${body}`
       : '';
   }
 
