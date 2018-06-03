@@ -17,6 +17,7 @@ html, body {
 * {
   box-sizing: border-box;
   outline: none !important;
+  user-select: none;
 }
 
 .splash-screen {

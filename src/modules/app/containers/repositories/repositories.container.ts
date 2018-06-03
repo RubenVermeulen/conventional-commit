@@ -7,7 +7,7 @@ import { LocalRepository } from '../../types/local-repository.type';
 import { AppSandbox } from '../../app.sandbox';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { RepositoryAddContainer } from '../repository-add/repository-add.container';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { combineLatest } from 'rxjs/observable/combineLatest';
 
 @Component({
@@ -20,14 +20,16 @@ import { combineLatest } from 'rxjs/observable/combineLatest';
       </div>
 
       <div class="main">
-        <div *ngIf="filteredRepositories$ | async as repositories">
-          <div *ngIf="repositories.length > 0; else noRepositories">
-            <app-repositories-list [repositories]="repositories"></app-repositories-list>
+        <perfect-scrollbar>
+          <div *ngIf="filteredRepositories$ | async as repositories">
+            <div *ngIf="repositories.length > 0; else noRepositories">
+              <app-repositories-list [repositories]="repositories"></app-repositories-list>
+            </div>
+            <ng-template #noRepositories>
+              <p class="info">Add a repository to begin.</p>
+            </ng-template>
           </div>
-          <ng-template #noRepositories>
-            <p class="info">Add a repository to begin.</p>
-          </ng-template>
-        </div>
+        </perfect-scrollbar>
       </div>
 
       <div class="footer">

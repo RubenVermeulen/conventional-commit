@@ -16,7 +16,7 @@
       height: 65px;
       padding: 0 1.25rem;
       background-color: #fafafa;
-      box-shadow: 0 2px 5px -2px rgba(0,0,0,0.35);
+      box-shadow: 0 2px 5px -2px rgba(0, 0, 0, 0.35);
 
       .title {
         font-size: 1.375rem;
@@ -37,7 +37,10 @@
     .main {
       overflow-x: hidden;
       height: 100%;
-      padding: 1rem 1.25rem;
+
+      .padding {
+        padding: 1rem 1.25rem;
+      }
     }
   }
 }

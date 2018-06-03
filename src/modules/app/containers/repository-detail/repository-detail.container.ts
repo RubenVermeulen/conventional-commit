@@ -35,41 +35,45 @@ import { NodeGitService } from '../../services/node-git.service';
         </div>
       </div>
       <div class="main">
-        <form [formGroup]="form" (submit)="onSubmit()">
-          <div class="form-group">
-            <label for="type">Type</label>
-            <select id="type" class="form-control" formControlName="type">
-              <option [ngValue]="null">--- Select your type ---</option>
-              <option *ngFor="let type of types" [ngValue]="type.value"><strong>{{type.name}}</strong></option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="scope">Scope</label>
-            <input type="text" id="scope" class="form-control" formControlName="scope">
-          </div>
-          <div class="form-group">
-            <label for="subject">Subject</label>
-            <input type="text" id="subject" class="form-control" formControlName="subject">
-            <small class="form-text text-muted">Your commit message</small>
-          </div>
-          <div class="form-group">
-            <label for="body">Body</label>
-            <textarea id="body" class="form-control" formControlName="body"></textarea>
-            <small class="form-text text-muted">All new lines will be removed.</small>
-          </div>
-          <div class="form-group">
-            <label for="breakingChanges">Breaking changes</label>
-            <textarea id="breakingChanges" class="form-control" formControlName="breakingChanges"></textarea>
-            <small class="form-text text-muted">All new lines will be removed.</small>
-          </div>
-          <div class="form-group">
-            <label for="issuesClosed">Issues closed</label>
-            <input type="text" id="type" class="form-control" formControlName="issuesClosed">
-          </div>
-          <div class="form-group">
-            <button type="submit" class="btn btn-primary" [disabled]="!form.valid">Commit</button>
-          </div>
-        </form>
+          <perfect-scrollbar>
+            <div class="padding">
+              <form [formGroup]="form" (submit)="onSubmit()">
+                <div class="form-group">
+                  <label for="type">Type</label>
+                  <select id="type" class="form-control" formControlName="type">
+                    <option [ngValue]="null">--- Select your type ---</option>
+                    <option *ngFor="let type of types" [ngValue]="type.value"><strong>{{type.name}}</strong></option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="scope">Scope</label>
+                  <input type="text" id="scope" class="form-control" formControlName="scope">
+                </div>
+                <div class="form-group">
+                  <label for="subject">Subject</label>
+                  <input type="text" id="subject" class="form-control" formControlName="subject">
+                  <small class="form-text text-muted">Your commit message</small>
+                </div>
+                <div class="form-group">
+                  <label for="body">Body</label>
+                  <textarea id="body" class="form-control" formControlName="body"></textarea>
+                  <small class="form-text text-muted">All new lines will be removed.</small>
+                </div>
+                <div class="form-group">
+                  <label for="breakingChanges">Breaking changes</label>
+                  <textarea id="breakingChanges" class="form-control" formControlName="breakingChanges"></textarea>
+                  <small class="form-text text-muted">All new lines will be removed.</small>
+                </div>
+                <div class="form-group">
+                  <label for="issuesClosed">Issues closed</label>
+                  <input type="text" id="type" class="form-control" formControlName="issuesClosed">
+                </div>
+                <div class="form-group">
+                  <button type="submit" class="btn btn-primary" [disabled]="!form.valid">Commit</button>
+                </div>
+              </form>
+            </div>
+          </perfect-scrollbar>
       </div>
     </div>
   `
