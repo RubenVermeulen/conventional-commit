@@ -38,7 +38,7 @@ export class GitService {
     const command = ['rev-list', '--all', '--count'];
 
     return this.execute(pathToRepository, command).pipe(
-      map(res => res.stdout)
+      map(res => Number(res.stdout))
     );
   }
 
