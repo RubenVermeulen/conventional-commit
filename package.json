@@ -19,7 +19,7 @@
   "scripts": {
     "postinstall": "npx electron-builder install-app-deps",
     "start": "node hooks/environments/set_profile.js && npm-run-all -p ng:serve electron:serve",
-    "build": "node hooks/environments/set_profile.js && webpack --config webpack.config.js && npm run electron:ts",
+    "build": "node hooks/environments/set_profile.js && webpack --config webpack.config.js && npm run electron:tsc",
     "build:prod": "node hooks/environments/set_profile.js && webpack --config webpack-prod.config.js && npm run electron:tsc",
     "ng:serve": "webpack-dev-server --port=4200",
     "electron:tsc": "tsc main.ts",
