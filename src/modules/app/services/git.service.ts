@@ -17,6 +17,12 @@ export class GitService {
   constructor() {
   }
 
+  status(pathToRepository: string): Observable<boolean> {
+    const command = ['status'];
+
+    return this.execute(pathToRepository, command).pipe(mapTo(true));
+  }
+
   stageAll(pathToRepository: string): Observable<boolean> {
     const command = ['add', '.'];
 

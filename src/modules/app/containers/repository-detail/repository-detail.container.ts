@@ -19,7 +19,6 @@ import {
   switchMap,
   takeUntil
 } from 'rxjs/operators';
-import { NodeGitService } from '../../services/node-git.service';
 import { Destroy } from 'ngx-reactivetoolkit';
 import { timer } from 'rxjs/observable/timer';
 
@@ -171,7 +170,6 @@ export class RepositoryDetailContainer implements OnInit, OnDestroy {
   constructor(private sb: AppSandbox,
               private fb: FormBuilder,
               private czLernaChangelogService: CzLernaChangelogService,
-              private nodeGitService: NodeGitService,
               private activatedRoute: ActivatedRoute) {
   }
 

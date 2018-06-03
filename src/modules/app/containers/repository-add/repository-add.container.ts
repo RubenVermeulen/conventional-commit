@@ -9,9 +9,7 @@ import {
   FormBuilder,
   Validators
 } from '@angular/forms';
-import { take } from 'rxjs/operators';
-import { Subject } from 'rxjs/Subject';
-import { NodeGitService } from '../../services/node-git.service';
+import { ReplaySubject } from 'rxjs/ReplaySubject';
 
 const {dialog} = window.require('electron').remote;
 
@@ -49,7 +47,7 @@ const {dialog} = window.require('electron').remote;
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-outline-dark" (click)="ngbActiveModal.close()">Close</button>
-        <button type="submit" class="btn btn-primary" [disabled]="!form.valid">Add</button>
+        <button type="submit" class="btn btn-primary" [disabled]="!form.valid || (error$ | async)">Add</button>
       </div>
     </form>
   `
@@ -62,12 +60,11 @@ export class RepositoryAddContainer implements OnInit {
     monorepo: [false, Validators.required]
   });
 
-  error$ = new Subject();
+  error$ = new ReplaySubject(1);
 
   constructor(private sb: AppSandbox,
               private fb: FormBuilder,
               public ngbActiveModal: NgbActiveModal,
-              private nodeGitService: NodeGitService,
               private changeDetectoRef: ChangeDetectorRef) {
   }
 
@@ -87,8 +84,7 @@ export class RepositoryAddContainer implements OnInit {
             path: pathToRepo
           });
 
-          this.nodeGitService.openRepository(pathToRepo)
-            .pipe(take(1))
+          this.sb.status(pathToRepo)
             .subscribe(
               () => {
                 this.error$.next(null);
@@ -104,19 +100,13 @@ export class RepositoryAddContainer implements OnInit {
   }
 
   onSubmit(): void {
-    this.error$.next(null);
-    this.nodeGitService.openRepository(this.form.value.path)
-      .pipe(take(1))
-      .subscribe(
-        (res) => {
-          this.sb.addRepository({
-            repositoryId: new Date().getMilliseconds().toString(),
-            name: this.form.value.name,
-            path: this.form.value.path,
-            hooks: true,
-            monorepo: false
-          });
-          this.ngbActiveModal.close();
-        });
+    this.sb.addRepository({
+      repositoryId: new Date().getMilliseconds().toString(),
+      name: this.form.value.name,
+      path: this.form.value.path,
+      hooks: true,
+      monorepo: false
+    });
+    this.ngbActiveModal.close();
   }
 }

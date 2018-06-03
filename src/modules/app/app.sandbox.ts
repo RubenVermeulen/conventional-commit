@@ -18,6 +18,10 @@ export class AppSandbox {
     this.store.dispatch(new RepositoriesAddAction(repository));
   }
 
+  status(pathToRepository: string): Observable<boolean> {
+    return this.gitService.status(pathToRepository);
+  }
+
   commit(pathToRepository: string, message: string, hooks: boolean = true): Observable<boolean> {
     return this.gitService.commit(pathToRepository, message, hooks);
   }

@@ -537,8 +537,6 @@ module.exports = {
     "historyApiFallback": true
   },
   externals: {
-    nodegit: 'commonjs nodegit',
-    child_process: 'commonjs child_process',
-    dugite: 'commonjs dugite',
+    dugite: 'commonjs dugite'
   }
 };
