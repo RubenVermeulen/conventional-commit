@@ -25,6 +25,8 @@ import {
 import { Destroy } from 'ngx-reactivetoolkit';
 import { timer } from 'rxjs/observable/timer';
 import { Subject } from 'rxjs/Subject';
+import { StagedFile } from '../../types/staged-file.type';
+import { UnstagedFile } from '../../types/unstaged-file.type';
 
 @Component({
   selector: 'app-ctn-home',
@@ -67,6 +69,13 @@ import { Subject } from 'rxjs/Subject';
                 <div class="value">{{localRepository.path}}</div>
               </div>
             </div>
+            <br>
+            <h4>Untracked files</h4>
+            <pre><div *ngFor="let file of untrackedFiles$ | async">{{file}}</div></pre>
+            <h4>Unstaged files</h4>
+            <pre><div *ngFor="let file of unstagedFiles$ | async">{{file.fileName}}</div></pre>
+            <h4>Staged files</h4>
+            <pre><div *ngFor="let file of stagedFiles$ | async">{{file.fileName}}</div></pre>
             <br>
             <h4>Commit</h4>
             <form [formGroup]="form">
@@ -187,8 +196,12 @@ export class RepositoryDetailContainer implements OnInit, OnDestroy {
   localRepository$: Observable<LocalRepository>;
   numberOfCommits$: Observable<number>;
   currentBranch$: Observable<string>;
+  stagedFiles$: Observable<StagedFile[]>;
+  untrackedFiles$: Observable<string[]>;
+  unstagedFiles$: Observable<UnstagedFile[]>;
   success$ = new Subject<string>();
   error$ = new Subject<boolean>();
+  timerFiles$ = timer(0, 2000);
 
   constructor(private sb: AppSandbox,
               private fb: FormBuilder,
@@ -202,6 +215,9 @@ export class RepositoryDetailContainer implements OnInit, OnDestroy {
     this.localRepository$ = this.calculateLocalRepository$();
     this.numberOfCommits$ = this.calculateNumberOfCommits$();
     this.currentBranch$ = this.calculateCurrentBranch$();
+    this.stagedFiles$ = this.calculateStagedFiles$();
+    this.untrackedFiles$ = this.calculateUntrackedFiles$();
+    this.unstagedFiles$ = this.calculateUnstagedFiles$();
   }
 
   ngOnDestroy(): void {
@@ -290,6 +306,33 @@ export class RepositoryDetailContainer implements OnInit, OnDestroy {
     return this.localRepository$.pipe(
       switchMap(repo => timer(0, 3500).pipe(
         switchMap(() => this.sb.currentBranch(repo.path)),
+        takeUntil(this.destroy$)
+      ))
+    );
+  }
+
+  private calculateStagedFiles$(): Observable<StagedFile[]> {
+    return this.localRepository$.pipe(
+      switchMap(repo => this.timerFiles$.pipe(
+        switchMap(() => this.sb.stagedFiles(repo.path)),
+        takeUntil(this.destroy$)
+      ))
+    );
+  }
+
+  private calculateUntrackedFiles$(): Observable<string[]> {
+    return this.localRepository$.pipe(
+      switchMap(repo => this.timerFiles$.pipe(
+        switchMap(() => this.sb.untrackedFiles(repo.path)),
+        takeUntil(this.destroy$)
+      ))
+    );
+  }
+
+  private calculateUnstagedFiles$(): Observable<UnstagedFile[]> {
+    return this.localRepository$.pipe(
+      switchMap(repo => this.timerFiles$.pipe(
+        switchMap(() => this.sb.unstagedFiles(repo.path)),
         takeUntil(this.destroy$)
       ))
     );

@@ -10,6 +10,8 @@ import {
   map,
   mapTo
 } from 'rxjs/operators';
+import { StagedFile } from '../types/staged-file.type';
+import { UnstagedFile } from '../types/unstaged-file.type';
 
 
 @Injectable()
@@ -53,6 +55,58 @@ export class GitService {
 
     return this.execute(pathToRepository, command).pipe(
       map(res => res.stdout)
+    );
+  }
+
+  stagedFiles(pathToRepository: string): Observable<StagedFile[]> {
+    const command = ['diff', '--cached', '--numstat'];
+
+    return this.execute(pathToRepository, command).pipe(
+      map(res => {
+        // split line breaks
+        let tmp: any = res.stdout.split(/\n/g);
+
+        // split by spaces in array item
+        tmp = tmp.map(v => v.split(/\s+/g));
+
+        // create staged file object
+        return tmp.map(v => ({
+            added: Number(v[0]),
+            deleted: Number(v[1]),
+            fileName: v[2],
+          })
+        );
+      })
+    );
+  }
+
+  untrackedFiles(pathToRepository: string): Observable<string[]> {
+    const command = ['ls-files', '--others', '--exclude-standard'];
+
+    return this.execute(pathToRepository, command).pipe(
+      map(res => res.stdout.split(/\n/g))
+    );
+  }
+
+  unstagedFiles(pathToRepository: string): Observable<UnstagedFile[]> {
+    const command = ['diff', '--numstat'];
+
+    return this.execute(pathToRepository, command).pipe(
+      map(res => {
+        // split line breaks
+        let tmp: any = res.stdout.split(/\n/g);
+
+        // split by spaces in array item
+        tmp = tmp.map(v => v.split(/\s+/g));
+
+        // create staged file object
+        return tmp.map(v => ({
+            added: Number(v[0]),
+            deleted: Number(v[1]),
+            fileName: v[2],
+          })
+        );
+      })
     );
   }
 

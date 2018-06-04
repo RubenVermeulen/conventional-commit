@@ -8,6 +8,8 @@ import {
 } from '../statemanagement/actions/repositories.actions';
 import { Observable } from 'rxjs/Observable';
 import { GitService } from './services/git.service';
+import { StagedFile } from './types/staged-file.type';
+import { UnstagedFile } from './types/unstaged-file.type';
 
 @Injectable()
 export class AppSandbox {
@@ -43,5 +45,17 @@ export class AppSandbox {
 
   currentBranch(pathToRepository: string): Observable<string> {
     return this.gitService.currentBranch(pathToRepository);
+  }
+
+  stagedFiles(pathToRepository: string): Observable<StagedFile[]> {
+    return this.gitService.stagedFiles(pathToRepository);
+  }
+
+  untrackedFiles(pathToRepository: string): Observable<string[]> {
+    return this.gitService.untrackedFiles(pathToRepository);
+  }
+
+  unstagedFiles(pathToRepository: string): Observable<UnstagedFile[]> {
+    return this.gitService.unstagedFiles(pathToRepository);
   }
 }
