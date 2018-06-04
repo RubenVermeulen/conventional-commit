@@ -17,6 +17,7 @@
       padding: 0 1.25rem;
       background-color: #fafafa;
       box-shadow: 0 2px 5px -2px rgba(0, 0, 0, 0.35);
+      z-index: 1;
 
       .title {
         font-size: 1.375rem;
@@ -41,15 +42,23 @@
       .padding {
         padding: 1rem 1.25rem;
       }
+
+      .details {
+        padding: .75rem 1.25rem;
+        background-color: #fafafa;
+        border-bottom: 1px solid #ebebeb;
+      }
     }
   }
 
   .key {
-    font-size: .875rem;
+    font-size: .75rem;
     color: #606060;
   }
 
   .value {
-
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }

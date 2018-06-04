@@ -42,8 +42,7 @@ import { UnstagedFile } from '../../types/unstaged-file.type';
       </div>
       <div class="main">
         <perfect-scrollbar>
-          <div class="padding">
-            <h4>Details</h4>
+          <div class="details">
             <div class="row">
               <div class="col">
                 <div class="key">Git hooks</div>
@@ -62,52 +61,55 @@ import { UnstagedFile } from '../../types/unstaged-file.type';
                 <div class="value">{{currentBranch$ | async}}</div>
               </div>
             </div>
-            <br>
-            <div class="row">
-              <div class="col">
-                <div class="key">Path</div>
-                <div class="value">{{localRepository.path}}</div>
-              </div>
-            </div>
-            <br>
-            <h4>Untracked files</h4>
-            <pre><div *ngFor="let file of untrackedFiles$ | async">{{file}}</div></pre>
-            <h4>Unstaged files</h4>
-            <pre><div *ngFor="let file of unstagedFiles$ | async">{{file.fileName}}</div></pre>
-            <h4>Staged files</h4>
-            <pre><div *ngFor="let file of stagedFiles$ | async">{{file.fileName}}</div></pre>
-            <br>
+
+            <!--<div class="row">-->
+              <!--<div class="col">-->
+                <!--<div class="key">Untracked files</div>-->
+                <!--<div class="value" *ngIf="untrackedFiles$ | async as files">{{files.length}}</div>-->
+              <!--</div>-->
+              <!--<div class="col">-->
+                <!--<div class="key">Unstaged files</div>-->
+                <!--<div class="value" *ngIf="unstagedFiles$ | async as files">{{files.length}}</div>-->
+              <!--</div>-->
+              <!--<div class="col">-->
+                <!--<div class="key">Stages files</div>-->
+                <!--<div class="value" *ngIf="stagedFiles$ | async as files">{{files.length}}</div>-->
+              <!--</div>-->
+            <!--</div>-->
+          </div>
+
+          <div class="padding">
             <h4>Commit</h4>
             <form [formGroup]="form">
               <div class="form-group">
-                <label for="type">Type</label>
-                <select id="type" class="form-control" formControlName="type">
+                <label for="type">Type *</label>
+                <select id="type" class="form-control form-control-sm" formControlName="type">
                   <option [ngValue]="null">--- Select your type ---</option>
                   <option *ngFor="let type of types" [ngValue]="type.value"><strong>{{type.name}}</strong></option>
                 </select>
               </div>
               <div class="form-group">
-                <label for="scope">Scope</label>
-                <input type="text" id="scope" class="form-control" formControlName="scope">
+                <label for="scope">Scope *</label>
+                <input type="text" id="scope" class="form-control form-control-sm" formControlName="scope">
               </div>
               <div class="form-group">
-                <label for="subject">Subject</label>
-                <input type="text" id="subject" class="form-control" formControlName="subject">
+                <label for="subject">Subject *</label>
+                <input type="text" id="subject" class="form-control form-control-sm" formControlName="subject">
                 <small class="form-text text-muted">Your commit message</small>
               </div>
               <div class="form-group">
                 <label for="body">Body</label>
-                <textarea id="body" class="form-control" formControlName="body"></textarea>
+                <textarea id="body" class="form-control form-control-sm" formControlName="body"></textarea>
                 <small class="form-text text-muted">All new lines will be removed.</small>
               </div>
               <div class="form-group">
                 <label for="breakingChanges">Breaking changes</label>
-                <textarea id="breakingChanges" class="form-control" formControlName="breakingChanges"></textarea>
+                <textarea id="breakingChanges" class="form-control form-control-sm" formControlName="breakingChanges"></textarea>
                 <small class="form-text text-muted">All new lines will be removed.</small>
               </div>
               <div class="form-group">
                 <label for="issuesClosed">Issues closed</label>
-                <input type="text" id="type" class="form-control" formControlName="issuesClosed">
+                <input type="text" id="type" class="form-control form-control-sm" formControlName="issuesClosed">
               </div>
               <div class="form-group">
                 <div class="row">
@@ -196,9 +198,6 @@ export class RepositoryDetailContainer implements OnInit, OnDestroy {
   localRepository$: Observable<LocalRepository>;
   numberOfCommits$: Observable<number>;
   currentBranch$: Observable<string>;
-  stagedFiles$: Observable<StagedFile[]>;
-  untrackedFiles$: Observable<string[]>;
-  unstagedFiles$: Observable<UnstagedFile[]>;
   success$ = new Subject<string>();
   error$ = new Subject<boolean>();
   timerFiles$ = timer(0, 2000);
@@ -215,9 +214,6 @@ export class RepositoryDetailContainer implements OnInit, OnDestroy {
     this.localRepository$ = this.calculateLocalRepository$();
     this.numberOfCommits$ = this.calculateNumberOfCommits$();
     this.currentBranch$ = this.calculateCurrentBranch$();
-    this.stagedFiles$ = this.calculateStagedFiles$();
-    this.untrackedFiles$ = this.calculateUntrackedFiles$();
-    this.unstagedFiles$ = this.calculateUnstagedFiles$();
   }
 
   ngOnDestroy(): void {
@@ -306,33 +302,6 @@ export class RepositoryDetailContainer implements OnInit, OnDestroy {
     return this.localRepository$.pipe(
       switchMap(repo => timer(0, 3500).pipe(
         switchMap(() => this.sb.currentBranch(repo.path)),
-        takeUntil(this.destroy$)
-      ))
-    );
-  }
-
-  private calculateStagedFiles$(): Observable<StagedFile[]> {
-    return this.localRepository$.pipe(
-      switchMap(repo => this.timerFiles$.pipe(
-        switchMap(() => this.sb.stagedFiles(repo.path)),
-        takeUntil(this.destroy$)
-      ))
-    );
-  }
-
-  private calculateUntrackedFiles$(): Observable<string[]> {
-    return this.localRepository$.pipe(
-      switchMap(repo => this.timerFiles$.pipe(
-        switchMap(() => this.sb.untrackedFiles(repo.path)),
-        takeUntil(this.destroy$)
-      ))
-    );
-  }
-
-  private calculateUnstagedFiles$(): Observable<UnstagedFile[]> {
-    return this.localRepository$.pipe(
-      switchMap(repo => this.timerFiles$.pipe(
-        switchMap(() => this.sb.unstagedFiles(repo.path)),
         takeUntil(this.destroy$)
       ))
     );

@@ -77,7 +77,7 @@ export class RepositoryAddContainer implements OnInit {
       (res) => {
         if (res) {
           const pathToRepo = res[0];
-          const repoName = pathToRepo.split('/').pop();
+          const repoName = pathToRepo.split(/([\/\\])/g).pop();
 
           this.form.patchValue({
             name: repoName,
